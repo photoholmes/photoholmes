@@ -1,0 +1,24 @@
+# python enviroments
+.venv
+venv
+.env
+
+# packaging
+*.egg-info/
+build/
+
+# caches
+__pycache__/
+
+# datasets & extra development folders
+/data/
+/datasets/
+/extra/
+weights/
+out/
+output/
+#Private
+private
+
+# MAC files
+.DS_Store

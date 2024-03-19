@@ -1,0 +1,4 @@
+arch: pretrained
+weights: <path_to_weights>
+use_confidence: True
+device: cpu

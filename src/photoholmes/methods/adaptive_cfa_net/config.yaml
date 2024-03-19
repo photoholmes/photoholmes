@@ -1,0 +1,3 @@
+arch: pretrained
+weights: <path_to_weights>
+

@@ -1,0 +1,2 @@
+weights : {ViT: <path_to_ViT_weigths>, HRNet: <path_to_HRNet_weigths>}
+device: cpu

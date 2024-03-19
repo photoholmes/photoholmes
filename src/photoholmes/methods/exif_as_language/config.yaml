@@ -1,0 +1,3 @@
+weights: <path_to_weights>
+arch_config: pretrained
+device: cpu

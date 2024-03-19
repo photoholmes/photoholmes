@@ -1,0 +1,19 @@
+image_size_threshold: 20000
+regular_image_feature_config:
+  block_size: 128
+  stride: 8
+  q: 2
+  T: 1
+small_image_feature_config:
+  block_size: 64
+  stride: 4
+  q: 2
+  T: 1
+pca_dim: 25
+mixture: uniform
+pca: original
+seed: 0
+saturation_mask_config: 
+  low_th: 6
+  high_th: 252
+  erotion_kernel_size: 3

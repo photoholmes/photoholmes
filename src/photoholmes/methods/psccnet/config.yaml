@@ -1,0 +1,6 @@
+arch_config: pretrained
+weights:
+  FENet: <path_to_FENet_weights>
+  SegNet: <path_to_SegNet_weights>
+  ClsNet: <path_to_ClsNet_weights>
+device: cpu
