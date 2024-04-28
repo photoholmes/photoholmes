@@ -32,7 +32,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "black", "isort", "pre-commit", "flake8", "mypy"]
+dev = ["black", "isort", "pre-commit", "flake8", "mypy"]
+test = ["pytest"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -30,3 +30,17 @@ jobs:
         run: pip install pre-commit && pre-commit install-hooks
       - name: Run pre-commit
         run: pre-commit run --hook-stage pre-merge-commit --all-files
+  Run-Tests:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - name: Checkout Actions Repo
+        uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip" # caching pip dependencies
+      - name: Install Dependencies
+        run: pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision && pip install .[test]
+      - name: Run Tests
+        run: pytest tests --doctest-modules --junitxml=junit/test-results.xml
