@@ -1,0 +1,46 @@
+name: Pre-merge Photoholmes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+jobs:
+  Code-Quality-Checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Actions Repo
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: set PY
+        run: echo "PY=$(python -VV | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+      - name: Setup pre-commit
+        run: pip install pre-commit && pre-commit install-hooks
+      - name: Run pre-commit
+        run: pre-commit run --hook-stage pre-merge-commit --all-files
+  Run-Tests:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - name: Checkout Actions Repo
+        uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip" # caching pip dependencies
+      - name: Install Dependencies
+        run: pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision && pip install .[test]
+      - name: Run Tests
+        run: pytest tests --doctest-modules --junitxml=junit/test-results.xml

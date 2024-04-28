@@ -113,7 +113,9 @@ class BaseTorchMethod(BaseMethod, Module):
         if "state_dict" in weights_.keys():
             weights_ = weights_["state_dict"]
 
-        self.load_state_dict(weights_, assign=True)
+        self.load_state_dict(
+            weights_, assign=True
+        )  # FIXME: asign limits torch version to >=2.1
 
     def to_device(self, device: Union[str, torch.device]):
         """Send the model to the device."""

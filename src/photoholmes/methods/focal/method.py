@@ -71,7 +71,9 @@ class Focal(BaseTorchMethod):
 
             self.clustering = KMeans(verbose=False)
         self.to_device(device)
-        self.eval()
+
+        for net in self.network_list:
+            net.eval()
 
     def forward(self, x: torch.Tensor):
         """
@@ -119,7 +121,7 @@ class Focal(BaseTorchMethod):
         # This operation destroys traces that typically indicate the presence of a
         # forgery. This indicates the method is most likely overfitted to
         # the dataset or to semantic forgery.
-        image = resize(image, [1024, 1024]).to(self.device)
+        image = resize(image, [1024, 1024]).to(self.device) / 255.0
 
         with torch.no_grad():
             Fo = self.forward(image[None, :])

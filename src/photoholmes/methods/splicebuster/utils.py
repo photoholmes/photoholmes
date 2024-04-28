@@ -68,7 +68,7 @@ def encode_matrix(
     X: NDArray[np.int8], T: int = 1, c: int = 4, axis: int = 0
 ) -> NDArray[np.int16]:
     """
-    Encodes X into the corresponding co-ocurrence features.
+    Encodes X as base 2*T-1 numbers to accelerate the co-ocurrence matrix calculation.
 
     Args:
         X (NDArray): Input image. Dims (H, W)

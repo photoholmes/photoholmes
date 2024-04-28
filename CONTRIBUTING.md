@@ -1,8 +1,6 @@
 # Contributing to Photoholmes
 
-PhotoHolmes is an open-source _python_ library, and welcomes any contribution users and developers wish to make. Through the library's github GITHUB_LINK (*), we are open to recieving any issues, bugs, suggestions, and pull requests.
-
-__(*) Note:__ Available after CVPR to respect the double-blind. 
+PhotoHolmes is an open-source _python_ library, and welcomes any contribution users and developers wish to make. Through the library's [github](https://github.com/photoholmes/photoholmes), we are open to recieving any issues, bugs, suggestions, and pull requests.
 
 ## Develop and Pull-Request to the hub
 

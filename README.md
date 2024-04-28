@@ -6,8 +6,6 @@
 
 PhotoHolmes is an open-source _python_ library designed to easily run and benchmark forgery detection methods on digital images. The library includes an implementation of popular and state-of-the-art methods, datasets and evaluation metrics, all of which easily integrates with their custom methods, datasets and metrics. The user can also evaluate a single image via the command-line-interface (CLI) or a full method in a chosen dataset via de Benchmark class.
 
-**Note:** The current source code and documentation is the submission of PhotoHolmes for the CVPR Workshop on Media Forensics, please read the [CVPR notes](CVPR_NOTES.md).
-
 ## Development setup
 
 The Python requirements are `python >= 3.10`. Create a virtual enviroment, either with conda or with pip. 

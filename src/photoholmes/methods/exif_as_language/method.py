@@ -141,6 +141,7 @@ class EXIFAsLanguage(BaseMethod):
 
         # Run clustering to get localization map
         ncuts = normalized_cut(pred_maps)
+        # TODO: change resize to our own implementation
         out_ms = cv2.resize(ms, (width, height), interpolation=cv2.INTER_LINEAR)
         out_ncuts = cv2.resize(
             ncuts.astype(np.float32),

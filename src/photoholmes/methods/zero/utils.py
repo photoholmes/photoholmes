@@ -89,3 +89,22 @@ def log_nfa(N_tests: int, ks: NDArray, n: int, p: float) -> NDArray:
         NDArray: array of the logarithm of the NFA for each k in ks.
     """
     return np.log10(N_tests) + log_bin_tail(ks, n, p)
+
+
+def closing(mask: NDArray, W: int = 9) -> NDArray:
+    Y, X = mask.shape
+
+    image_out = np.zeros_like(mask)
+    mask_aux = np.zeros_like(mask)
+    for x in range(W, X - W):
+        for y in range(W, Y - W):
+            if mask[y, x] != 0:
+                mask_aux[y - W : y + W + 1, x - W : x + W + 1] = 1
+                image_out[y - W : y + W + 1, x - W : x + W + 1] = 1
+
+    for x in range(W, X - W):
+        for y in range(W, Y - W):
+            if mask_aux[y, x] == 0:
+                image_out[y - W : y + W + 1, x - W : x + W + 1] = 0
+
+    return image_out

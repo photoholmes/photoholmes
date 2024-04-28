@@ -143,7 +143,7 @@ class Benchmark:
         )
 
         image_count = 0
-        for data, mask, image_name in tqdm(dataset, desc="Processing Images"):  # type: ignore
+        for data, mask, image_name in tqdm(dataset, desc="Processing Images"):
             output = None
             if self.use_existing_output:
                 output = self._load_existing_output(output_path, image_name)
