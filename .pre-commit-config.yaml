@@ -11,8 +11,6 @@ repos:
     hooks:
       - id: black
         exclude: research/.+\.py
-        stages:
-          - pre-commit
 
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
@@ -20,8 +18,6 @@ repos:
       - id: isort
         exclude: research/.+\.py
         name: isort (python)
-        stages:
-          - pre-commit
 
   - repo: https://github.com/pycqa/flake8
     rev: 6.1.0
