@@ -87,8 +87,8 @@ class GaussianUniformEM:
         Returns:
             float: The loss.
         """
-        n_samples, n_features = X.shape
-        init_index = self.random_state.random_integers(
+        n_samples, _ = X.shape
+        init_index = self.random_state.randint(
             low=0, high=(n_samples - 1), size=(1,)
         ).squeeze()
         self.mean = X[init_index]

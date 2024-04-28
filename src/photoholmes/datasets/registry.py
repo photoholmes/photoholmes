@@ -5,6 +5,7 @@ from enum import Enum, unique
 class DatasetRegistry(Enum):
     COLUMBIA = "columbia"
     COLUMBIA_OSN = "columbia_osn"
+    COLUMBIA_WEBP = "columbia_webp"
     COVERAGE = "coverage"
     REALISTIC_TAMPERING = "realistic_tampering"
     REALISTIC_TAMPERING_WEBP = "realistic_tampering_webp"

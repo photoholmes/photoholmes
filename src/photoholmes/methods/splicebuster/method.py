@@ -242,13 +242,13 @@ class Splicebuster(BaseMethod):
         Efficiently compute histograms for stride x stride blocks.
 
         Args:
-                qhh (np.ndarray): Encoded horizontal residuals.
-                qhv (np.ndarray): Encoded horizontal-vertical residuals.
-                qvh (np.ndarray): Encoded vertical-horizontal residuals.
-                qvv (np.ndarray): Encoded vertical residuals.
-                stride (int): Stride for the blocks.
-                mask (np.ndarray | None): Mask to apply to the histograms. If None,
-                    no mask is applied.
+            qhh (np.ndarray): Encoded horizontal residuals.
+            qhv (np.ndarray): Encoded horizontal-vertical residuals.
+            qvh (np.ndarray): Encoded vertical-horizontal residuals.
+            qvv (np.ndarray): Encoded vertical residuals.
+            stride (int): Stride for the blocks.
+            mask (np.ndarray | None): Mask to apply to the histograms. If None,
+                no mask is applied.
 
         Returns:
             Tuple[NDArray, NDArray, int, Tuple[NDArray, NDArray]]:

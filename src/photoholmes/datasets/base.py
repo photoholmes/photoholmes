@@ -41,7 +41,13 @@ class BaseDataset(ABC, Dataset):
         self,
         dataset_path: str,
         preprocessing_pipeline: Optional[PreProcessingPipeline] = None,
-        load: List[Literal["image", "dct_coefficients", "qtables",]] = [
+        load: List[
+            Literal[
+                "image",
+                "dct_coefficients",
+                "qtables",
+            ]
+        ] = [
             "image",
             "dct_coefficients",
             "qtables",

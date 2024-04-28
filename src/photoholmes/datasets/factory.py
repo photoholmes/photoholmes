@@ -11,7 +11,13 @@ class DatasetFactory:
         dataset_name: Union[str, DatasetRegistry],
         dataset_path: str,
         preprocessing_pipeline: Optional[PreProcessingPipeline] = None,
-        load: List[Literal["image", "dct_coefficients", "qtables",]] = [
+        load: List[
+            Literal[
+                "image",
+                "dct_coefficients",
+                "qtables",
+            ]
+        ] = [
             "image",
             "dct_coefficients",
             "qtables",
@@ -44,6 +50,15 @@ class DatasetFactory:
                     preprocessing_pipeline=preprocessing_pipeline,
                     load=load,
                     tampered_only=True,
+                )
+            case DatasetRegistry.COLUMBIA_WEBP:
+                from photoholmes.datasets.columbia_webp import ColumbiaWebPDataset
+
+                return ColumbiaWebPDataset(
+                    dataset_path=dataset_path,
+                    preprocessing_pipeline=preprocessing_pipeline,
+                    load=load,
+                    tampered_only=tampered_only,
                 )
             case DatasetRegistry.COVERAGE:
                 from photoholmes.datasets.coverage import CoverageDataset

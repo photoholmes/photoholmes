@@ -160,7 +160,7 @@ def run_catnet(
         plt.imshow(heatmap)
         plt.savefig(output_folder / f"{image_path.stem}_catnet_heatmap.png")
         logger.info(
-            f"Heatmap saved to {output_folder / f'{image_path.stem}_catnet_heatmap.png'}"
+            f"Heatmap saved to {output_folder / f'{image_path.stem}_catnet_heatmap.png'}"  # noqa: E501
         )
 
     if show_plot:
@@ -270,13 +270,13 @@ def run_exif_as_language(
         plt.imshow(mask)
         plt.savefig(output_folder / f"{image_path.stem}_exif_as_language_mask.png")
         logger.info(
-            f"Mask saved to {output_folder / f'{image_path.stem}_exif_as_language_mask.png'}"
+            f"Mask saved to {output_folder / f'{image_path.stem}_exif_as_language_mask.png'}"  # noqa: E501
         )
 
         plt.imshow(heatmap)
         plt.savefig(output_folder / f"{image_path.stem}_exif_as_language_heatmap.png")
         logger.info(
-            f"Heatmap saved to {output_folder / f'{image_path.stem}_exif_as_language_heatmap.png'}"
+            f"Heatmap saved to {output_folder / f'{image_path.stem}_exif_as_language_heatmap.png'}"  # noqa: E501
         )
 
         with open(
@@ -284,7 +284,7 @@ def run_exif_as_language(
         ) as f:
             f.write(f"score: {score}")
         logger.info(
-            f"Score saved to {output_folder / f'{image_path.stem}_exif_as_language_score.txt'}"
+            f"Score saved to {output_folder / f'{image_path.stem}_exif_as_language_score.txt'}"  # noqa: E501
         )
 
     if show_plot:
@@ -444,8 +444,8 @@ def run_psccnet(
     weights_folder: Annotated[
         Optional[Path],
         typer.Option(
-            help="Path to the weights folder. Inside the folder, the weights should be named `ClsNet.pth`, `FENet.pth` and `SegNet.pth`."
-        ),  # noqa: E501")
+            help="Path to the weights folder. Inside the folder, the weights should be named `ClsNet.pth`, `FENet.pth` and `SegNet.pth`."  # noqa: E501"
+        ),
     ] = None,
     overlay: Annotated[bool, typer.Option(help=OVERLAY_HELP)] = False,
     show_plot: Annotated[bool, typer.Option(help=SHOW_PLOT_HELP)] = True,
@@ -505,12 +505,12 @@ def run_psccnet(
         plt.imshow(heatmap)
         plt.savefig(output_folder / f"{image_path.stem}_psccnet_heatmap.png")
         logger.info(
-            f"Heatmap saved to {output_folder / f'{image_path.stem}_psccnet_heatmap.png'}"
+            f"Heatmap saved to {output_folder / f'{image_path.stem}_psccnet_heatmap.png'}"  # noqa: E501
         )
         with open(output_folder / f"{image_path.stem}_psccnet_detection.txt", "w") as f:
             f.write(f"score: {detection.item()}")
         logger.info(
-            f"Detection score saved to {output_folder / f'{image_path.stem}_psccnet_detection.txt'}"
+            f"Detection score saved to {output_folder / f'{image_path.stem}_psccnet_detection.txt'}"  # noqa: E501
         )
 
     if show_plot:
@@ -557,7 +557,7 @@ def run_splicebuster(
         plt.imshow(heatmap)
         plt.savefig(output_folder / f"{image_path.stem}_splicebuster_heatmap.png")
         logger.info(
-            f"Heatmap saved to {output_folder / f'{image_path.stem}_splicebuster_heatmap.png'}"
+            f"Heatmap saved to {output_folder / f'{image_path.stem}_splicebuster_heatmap.png'}"  # noqa: E501
         )
 
     if show_plot:
@@ -631,30 +631,37 @@ def run_trufor(
                 f.write(f"score: {detection.item()}")
 
     if show_plot:
-        cool_heatmap = (heatmap * confidence).numpy()
         plots = [
             {"title": "Original Image", "image": image.permute(1, 2, 0).numpy()},
             {"title": "Heatmap", "image": heatmap.numpy()},
-            {"title": "Confidence", "image": confidence.numpy()},
-            {"title": "Heatmap w/confidence", "image": cool_heatmap},
         ]
-        if overlay:
+
+        if confidence is not None:
+            cool_heatmap = (heatmap * confidence).numpy()
             plots.extend(
                 [
-                    {
-                        "title": "Overlay heatmap",
-                        "image": overlay_mask(
-                            image.permute(1, 2, 0).numpy(), heatmap.numpy()
-                        ),
-                    },
+                    {"title": "Confidence", "image": confidence.numpy()},
+                    {"title": "Heatmap w/confidence", "image": cool_heatmap},
+                ]
+            )
+        if overlay:
+            plots.append(
+                {
+                    "title": "Overlay heatmap",
+                    "image": overlay_mask(
+                        image.permute(1, 2, 0).numpy(), heatmap.numpy()
+                    ),
+                },
+            )
+            if confidence is not None:
+                plots.append(
                     {
                         "title": "Overlay heatmap w/confidence",
                         "image": overlay_mask(
                             image.permute(1, 2, 0).numpy(), cool_heatmap
                         ),
-                    },
-                ]
-            )
+                    }
+                )
 
         plot_results("Output of TruFor method", plots)
     return
@@ -666,6 +673,9 @@ def run_zero(
     output_folder: Annotated[
         Optional[Path], typer.Option(help=OUTPUT_FOLDER_HELP)
     ] = None,
+    missing_grids: Annotated[
+        bool, typer.Option(help="Include missing grid mask in plot.")
+    ] = True,
     overlay: Annotated[bool, typer.Option(help=OVERLAY_HELP)] = False,
     show_plot: Annotated[bool, typer.Option(help=SHOW_PLOT_HELP)] = True,
 ):
@@ -676,10 +686,10 @@ def run_zero(
     image = read_image(str(image_path))
     model_input = zero_preprocessing(image=image)
 
-    zero = Zero()
+    zero = Zero(missing_grids=missing_grids)
 
     logger.info("Running Zero method")
-    mask, votes, main_grid = zero.predict(**model_input)
+    _, mask, votes, missing_grids_mask = zero.predict(**model_input)
 
     if output_folder is not None:
         os.makedirs(output_folder, exist_ok=True)
@@ -693,21 +703,52 @@ def run_zero(
         logger.info(
             f"Votes saved to {output_folder / f'{image_path.stem}_zero_votes.npy'}"
         )
-        np.save(output_folder / f"{image_path.stem}_zero_main_grid.npy", main_grid)
-        logger.info(
-            f"Votes saved to {output_folder / f'{image_path.stem}_zero_main_grid.npy'}"
-        )
+        if missing_grids_mask is not None:
+            plt.imshow(missing_grids_mask)
+            plt.savefig(output_folder / f"{image_path.stem}_zero_missing_grids.png")
+            logger.info(
+                f"Votes saved to {output_folder / f'{image_path.stem}_zero_missing_grids.png'}"  # noqa: E501
+            )
 
     if show_plot:
         plots = [
             {"title": "Original Image", "image": image.permute(1, 2, 0).numpy()},
             {"title": "Mask", "image": mask},
+            {"title": "Votes", "image": votes},
         ]
+        if missing_grids_mask is not None:
+            plots.extend(
+                [
+                    {"title": "Missing grids", "image": missing_grids_mask},
+                    {
+                        "title": "Mask + Missing grids",
+                        "image": np.logical_or(mask, missing_grids_mask),
+                    },
+                ]
+            )
         if overlay:
             plots.append(
                 {
-                    "title": "Overlay",
+                    "title": "Mask Overlay",
                     "image": overlay_mask(image.permute(1, 2, 0).numpy(), mask),
                 }
             )
+            if missing_grids_mask is not None:
+                plots.append(
+                    {
+                        "title": "Missing grids Overlay",
+                        "image": overlay_mask(
+                            image.permute(1, 2, 0).numpy(), missing_grids_mask
+                        ),
+                    }
+                )
+                plots.append(
+                    {
+                        "title": "Mask + Missing grids Overlay",
+                        "image": overlay_mask(
+                            image.permute(1, 2, 0).numpy(),
+                            np.logical_or(missing_grids_mask, mask).astype(int),
+                        ),
+                    }
+                )
         plot_results("Output of Zero method", plots)

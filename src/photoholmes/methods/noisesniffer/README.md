@@ -1,8 +1,8 @@
 # Noisesniffer: Image forgery detection based on noise inspection: analysis and refinement of the Noisesniffer method
 
-This is the implementation of the method by Gardella et al. that can be found [here](https://ipolcore.ipol.im/demo/clientApp/demo.html?id=77777000341). 
+This is the implementation of the method by Gardella et al. that can be found [here](https://www.ipol.im/pub/art/2024/462/). 
 
-The code contained in this library was derived from [the original implementation](https://ipolcore.ipol.im/demo/clientApp/demo.html?id=77777000341), making only minor changes to fit the PhotoHolmes library structure. 
+The code contained in this library was derived from [the original implementation](https://ipolcore.ipol.im/demo/clientApp/demo.html?id=462), making only minor changes to fit the PhotoHolmes library structure. 
 
 ## Description
 

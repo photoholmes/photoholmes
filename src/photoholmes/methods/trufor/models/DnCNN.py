@@ -180,7 +180,9 @@ class DnCNN(nn.Module):
         kernels = [
             kernel,
         ] * depth
-        features = [nfeatures,] * (depth - 1) + [
+        features = [
+            nfeatures,
+        ] * (depth - 1) + [
             nplanes_out,
         ]
         bns = (

@@ -1,6 +1,5 @@
-from typing import Any, Dict, Optional, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Tuple, TypeVar, Union
 
-import cv2 as cv
 import numpy as np
 import torch
 from numpy.typing import NDArray
@@ -132,15 +131,31 @@ class ToTensor(BasePreprocessing):
         return {"image": t_image, **kwargs}
 
 
+def img_to_numpy(image: Union[Tensor, NDArray, Image]) -> NDArray:
+    t_image = None
+    if isinstance(image, Tensor):
+        t_image = image.permute(1, 2, 0).cpu().numpy()
+    elif isinstance(image, np.ndarray):
+        t_image = image.copy()
+    else:
+        t_image = np.array(image)
+    return t_image
+
+
 class ToNumpy(BasePreprocessing):
     """
     Converts inputs to numpy arrays. If input is already a numpy array,
     it leaves it as is.
     """
 
-    def __call__(
-        self, image: Optional[Union[T, Image]] = None, **kwargs
-    ) -> Dict[str, Any]:
+    def __init__(self, image_keys: List[str] = ["image"]) -> None:
+        """
+        Args:
+            image_keys (List[str]): List of keys that have images.
+        """
+        self.image_keys = image_keys
+
+    def __call__(self, **kwargs) -> Dict[str, Any]:
         """
         Args:
             image(Optional[Union[T, Image]]): Image to be converted to a tensor.
@@ -151,13 +166,9 @@ class ToNumpy(BasePreprocessing):
                 - "image": The input image as a numpy array.
                 - **kwargs: The additional keyword arguments passed through unchanged.
         """
-        t_image = None
-        if isinstance(image, Tensor):
-            t_image = image.permute(1, 2, 0).cpu().numpy()
-        elif isinstance(image, np.ndarray):
-            t_image = image.copy()
-        elif image is not None:
-            t_image = np.array(image)
+        for k in self.image_keys:
+            if k in kwargs:
+                kwargs[k] = img_to_numpy(kwargs[k])
 
         for k, v in kwargs.items():
             if isinstance(v, np.ndarray):
@@ -165,18 +176,35 @@ class ToNumpy(BasePreprocessing):
             elif isinstance(v, Tensor):
                 kwargs[k] = v.cpu().numpy()
             else:
-                kwargs[k] = v
+                try:
+                    kwargs[k] = np.array(v)
+                except ValueError:
+                    kwargs[k] = v
 
-        if t_image is None:
-            return {**kwargs}
-        else:
-            return {"image": t_image, **kwargs}
+        return {**kwargs}
+
+
+def rgb_to_gray(image: T) -> T:
+    if isinstance(image, Tensor):
+        image = 0.299 * image[0] + 0.587 * image[1] + 0.114 * image[2]
+        image = image.unsqueeze(0)
+    else:
+        image = 0.299 * image[..., 0] + 0.587 * image[..., 1] + 0.114 * image[..., 2]
+        image = image[..., np.newaxis]
+    return image
 
 
 class RGBtoGray(BasePreprocessing):
     """
     Converts an RGB image to grayscale, following the ITU-R BT.601 stardard.
     """
+
+    def __init__(self, extra_image_keys: List[str] = []) -> None:
+        """
+        Args:
+            extra_image_keys (List[str]): Extra image keys to convert to grayscale.
+        """
+        self.extra_image_keys = extra_image_keys
 
     def __call__(self, image: T, **kwargs) -> Dict[str, Any]:
         """
@@ -189,14 +217,11 @@ class RGBtoGray(BasePreprocessing):
                 - "image": The input image as a grayscale numpy array or PyTorch tensor.
                 - **kwargs: The additional keyword arguments passed through unchanged.
         """
-        if isinstance(image, Tensor):
-            image = 0.299 * image[0] + 0.587 * image[1] + 0.114 * image[2]
-            image = image.unsqueeze(0)
-        else:
-            image = (
-                0.299 * image[..., 0] + 0.587 * image[..., 1] + 0.114 * image[..., 2]
-            )
-            image = image[..., np.newaxis]
+        image = rgb_to_gray(image)
+        for key in self.extra_image_keys:
+            if key in kwargs:
+                kwargs[key] = rgb_to_gray(kwargs[key])
+
         return {"image": image, **kwargs}
 
 
@@ -205,10 +230,16 @@ class RoundToUInt(BasePreprocessing):
     Rounds the input float tensor and converts it to an unsigned integer.
     """
 
-    def __call__(self, image: Tensor, **kwargs) -> Dict[str, Any]:
+    def __init__(self, apply_on: List[str] = ["image"]) -> None:
         """
         Args:
-            image (Tensor): Image to be converted to rounded into uint.
+            apply_on (List[str]): List of keys to apply the rounding to.
+        """
+        self.apply_on = apply_on
+
+    def __call__(self, **kwargs) -> Dict[str, Any]:
+        """
+        Args:
             **kwargs: Additional keyword arguments to passthrough.
 
         Returns:
@@ -216,8 +247,14 @@ class RoundToUInt(BasePreprocessing):
                 - "image": The input image rounded as a PyTorch tensor.
                 - **kwargs: The additional keyword arguments passed through unchanged.
         """
-        rounded_image = torch.round(image).byte()
-        return {"image": rounded_image, **kwargs}
+        for k in self.apply_on:
+            if k in kwargs:
+                if isinstance(kwargs[k], Tensor):
+                    kwargs[k] = torch.round(kwargs[k]).byte()
+                elif isinstance(kwargs[k], np.ndarray):
+                    kwargs[k] = np.round(kwargs[k]).astype(np.uint8)
+
+        return kwargs
 
 
 class GrayToRGB(BasePreprocessing):
@@ -275,26 +312,3 @@ class GetImageSize(BasePreprocessing):
         else:
             raise ValueError(f"Image type not supported: {type(image)}")
         return {"image": image, "image_size": size, **kwargs}
-
-
-class RGBtoYCrCb(BasePreprocessing):
-    """
-    Converts an RGB image to YCrCb.
-    """
-
-    def __call__(self, image: T, **kwargs) -> Dict[str, Any]:
-        """
-        Args:
-            image (T): Image to be converted to YCrCb.
-            **kwargs: Additional keyword arguments to passthrough.
-
-        Returns:
-            Dict[str, Any]: A dictionary with the following key-value pairs:
-                - "image": The input image as a YCrCb PyTorch tensor.
-                - **kwargs: The additional keyword arguments passed through unchanged.
-        """
-        np_image = ToNumpy()(image)["image"]
-        t_np_image = cv.cvtColor(np_image, cv.COLOR_RGB2YCrCb)
-        t_image = ToTensor()(t_np_image)["image"]
-
-        return {"image": t_image, **kwargs}
