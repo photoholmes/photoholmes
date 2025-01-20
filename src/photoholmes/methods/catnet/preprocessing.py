@@ -10,11 +10,11 @@ from photoholmes.preprocessing.pipeline import PreProcessingPipeline
 
 
 def get_binary_volume(x: Tensor, T: int = 20) -> Tensor:
-    x_vol = torch.zeros(size=(T + 1, x.shape[1], x.shape[2]))
+    x_vol = torch.zeros(size=(T + 1, x.shape[1], x.shape[2]), device=x.device)
 
     x_vol[0] += (x == 0).float().squeeze()
 
-    indices = torch.arange(1, T).unsqueeze(1).unsqueeze(2)
+    indices = torch.arange(1, T, device=x.device).unsqueeze(1).unsqueeze(2)
     x_vol[1:T] += ((x == indices) | (x == -indices)).float().squeeze()
 
     x_vol[T] += (x >= T).float().squeeze()
@@ -73,7 +73,11 @@ class CatnetPreprocessing(BasePreprocessing):
 
         crop_size = ((h // 8) * 8, (w // 8) * 8)
         if h < crop_size[0] or w < crop_size[1]:
-            temp = torch.full((max(h, crop_size[0]), max(w, crop_size[1]), 3), 127.5)
+            temp = torch.full(
+                (max(h, crop_size[0]), max(w, crop_size[1]), 3),
+                127.5,
+                device=image.device,
+            )
             temp[: image.shape[0], : image.shape[1], :] = image
             max_h = max(
                 crop_size[0],
@@ -84,7 +88,9 @@ class CatnetPreprocessing(BasePreprocessing):
                 max([dct_coefficients[c].shape[1] for c in range(self.n_dct_channels)]),
             )
             for i in range(self.n_dct_channels):
-                temp = torch.full((max_h, max_w), 0.0)  # pad with 0
+                temp = torch.full(
+                    (max_h, max_w), 0.0, device=image.device
+                )  # pad with 0
                 temp[: dct_coefficients[i].shape[0], : dct_coefficients[i].shape[1]] = (
                     dct_coefficients[i][:, :]
                 )

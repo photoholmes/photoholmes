@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import List, Optional, Tuple
 
@@ -13,7 +14,7 @@ from torch import Tensor
 logger = logging.getLogger(__name__)
 
 
-def read_image(path: str) -> Tensor:
+def read_image(path: str | Path) -> Tensor:
     """
     Read an image from a file and return it as a tensor.
 
@@ -24,7 +25,7 @@ def read_image(path: str) -> Tensor:
         Tensor: The image as a tensor.
     """
     return torch.from_numpy(
-        cv.cvtColor(cv.imread(path), cv.COLOR_BGR2RGB).transpose(2, 0, 1)
+        cv.cvtColor(cv.imread(str(path)), cv.COLOR_BGR2RGB).transpose(2, 0, 1)
     )
 
 
