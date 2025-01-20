@@ -33,7 +33,7 @@ pip install -e .[dev]
 
 ## Benchmarking
 
-One of the main PhotoHolmes library features is the capacity to easily bechmark a `method` over a `dataset`, evaluating on a set of `metrics`. This means one can evaluate existing and custom methods uniformly and fairly, simplifying the process of method comparison.
+One of the main PhotoHolmes library features is the capacity to easily benchmark a `method` over a `dataset`, evaluating on a set of `metrics`. This means one can evaluate existing and custom methods uniformly and fairly, simplifying the process of method comparison.
 
 This can be invoked in a simple manner by creating an instance of the `Benchmark` class and calling the `run` method, in the following way:
 
