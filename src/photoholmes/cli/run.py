@@ -69,8 +69,8 @@ def run_adaptive_cfa_net(
         adaptive_cfa_net_preprocessing,
     )
 
-    image = read_image(str(image_path))
-    model_input = adaptive_cfa_net_preprocessing(image=image)
+    image = read_image(image_path)
+    model_input = adaptive_cfa_net_preprocessing(image=image.to(device))
 
     if weights_path is None:
         logger.info(
@@ -88,11 +88,12 @@ def run_adaptive_cfa_net(
     adaptive_cfa_net.to_device(device)
 
     heatmap = adaptive_cfa_net.predict(**model_input)
+    heatmap = heatmap.cpu()
 
     if output_folder is not None:
         os.makedirs(output_folder, exist_ok=True)
 
-        plt.imshow(heatmap)
+        plt.imshow(heatmap.numpy())
         plt.savefig(output_folder / f"{image_path.stem}_adaptive_cfa_net_heatmap.png")
         logger.info(
             f"Heatmap saved to {output_folder / f'{image_path.stem}_adaptive_cfa_net_heatmap.png'}"  # noqa: E501
@@ -131,10 +132,13 @@ def run_catnet(
 ):
     from photoholmes.methods.catnet import CatNet, catnet_preprocessing
 
-    image = read_image(str(image_path))
+    image = read_image(image_path)
     dct_coefficients, qtables = read_jpeg_data(str(image_path))
+
     model_input = catnet_preprocessing(
-        image=image, dct_coefficients=dct_coefficients, qtables=qtables
+        image=image.to(device),
+        dct_coefficients=dct_coefficients.to(device),
+        qtables=qtables.to(device),
     )
 
     if weights_path is None:
@@ -153,6 +157,7 @@ def run_catnet(
     catnet.to_device(device)
 
     heatmap, _ = catnet.predict(**model_input)
+    heatmap = heatmap.cpu()
 
     if output_folder is not None:
         os.makedirs(output_folder, exist_ok=True)
@@ -160,7 +165,7 @@ def run_catnet(
         plt.imshow(heatmap)
         plt.savefig(output_folder / f"{image_path.stem}_catnet_heatmap.png")
         logger.info(
-            f"Heatmap saved to {output_folder / f'{image_path.stem}_catnet_heatmap.png'}"
+            f"Heatmap saved to {output_folder / f'{image_path.stem}_catnet_heatmap.png'}"  # noqa: E501
         )
 
     if show_plot:
@@ -191,7 +196,7 @@ def run_dq(
 ):
     from photoholmes.methods.dq import DQ, dq_preprocessing
 
-    image = read_image(str(image_path))
+    image = read_image(image_path)
     dct_coefficients, _ = read_jpeg_data(str(image_path))
     model_input = dq_preprocessing(image=image, dct_coefficients=dct_coefficients)
 
@@ -244,8 +249,8 @@ def run_exif_as_language(
         exif_as_language_preprocessing,
     )
 
-    image = read_image(str(image_path))
-    model_input = exif_as_language_preprocessing(image=image)
+    image = read_image(image_path)
+    model_input = exif_as_language_preprocessing(image=image.to(device))
 
     if weights is None:
         logger.info(
@@ -270,13 +275,13 @@ def run_exif_as_language(
         plt.imshow(mask)
         plt.savefig(output_folder / f"{image_path.stem}_exif_as_language_mask.png")
         logger.info(
-            f"Mask saved to {output_folder / f'{image_path.stem}_exif_as_language_mask.png'}"
+            f"Mask saved to {output_folder / f'{image_path.stem}_exif_as_language_mask.png'}"  # noqa E501
         )
 
         plt.imshow(heatmap)
         plt.savefig(output_folder / f"{image_path.stem}_exif_as_language_heatmap.png")
         logger.info(
-            f"Heatmap saved to {output_folder / f'{image_path.stem}_exif_as_language_heatmap.png'}"
+            f"Heatmap saved to {output_folder / f'{image_path.stem}_exif_as_language_heatmap.png'}"  # noqa E501
         )
 
         with open(
@@ -284,7 +289,7 @@ def run_exif_as_language(
         ) as f:
             f.write(f"score: {score}")
         logger.info(
-            f"Score saved to {output_folder / f'{image_path.stem}_exif_as_language_score.txt'}"
+            f"Score saved to {output_folder / f'{image_path.stem}_exif_as_language_score.txt'}"  # noqa E501
         )
 
     if show_plot:
@@ -331,8 +336,8 @@ def run_focal(
 ):
     from photoholmes.methods.focal import Focal, focal_preprocessing
 
-    image = read_image(str(image_path))
-    model_input = focal_preprocessing(image=image)
+    image = read_image(image_path)
+    model_input = focal_preprocessing(image=image.to(device))
 
     if vit_weights is None:
         logger.info(
@@ -360,7 +365,7 @@ def run_focal(
     focal = Focal(weights={"ViT": str(vit_weights), "HRNet": str(hrnet_weights)})
     focal.to_device(device)
 
-    mask = focal.predict(**model_input)
+    mask = focal.predict(**model_input).cpu()
 
     if output_folder is not None:
         os.makedirs(output_folder, exist_ok=True)
@@ -404,7 +409,7 @@ def run_noisesniffer(
         noisesniffer_preprocessing,
     )
 
-    image = read_image(str(image_path))
+    image = read_image(image_path)
     model_input = noisesniffer_preprocessing(image=image)
 
     noisesniffer = Noisesniffer()
@@ -417,7 +422,7 @@ def run_noisesniffer(
         plt.imshow(mask)
         plt.savefig(output_folder / f"{image_path.stem}_noisesniffer_mask.png")
         logger.info(
-            f"Mask saved to {output_folder / f'{image_path.stem}_noisesniffer_mask.png'}"
+            f"Mask saved to {output_folder / f'{image_path.stem}_noisesniffer_mask.png'}"  # noqa: E501
         )
 
     if show_plot:
@@ -453,8 +458,8 @@ def run_psccnet(
 ):
     from photoholmes.methods.psccnet import PSCCNet, psccnet_preprocessing
 
-    image = read_image(str(image_path))
-    model_input = psccnet_preprocessing(image=image)
+    image = read_image(image_path)
+    model_input = psccnet_preprocessing(image=image.to(device))
 
     if weights_folder is None:
         logger.info("No weights provided, using default path `weights/psccnet/`.")
@@ -498,6 +503,8 @@ def run_psccnet(
     )
 
     heatmap, detection = psccnet.predict(**model_input)
+    heatmap = heatmap.cpu()
+    detection = detection.cpu()
 
     if output_folder is not None:
         os.makedirs(output_folder, exist_ok=True)
@@ -505,12 +512,12 @@ def run_psccnet(
         plt.imshow(heatmap)
         plt.savefig(output_folder / f"{image_path.stem}_psccnet_heatmap.png")
         logger.info(
-            f"Heatmap saved to {output_folder / f'{image_path.stem}_psccnet_heatmap.png'}"
+            f"Heatmap saved to {output_folder / f'{image_path.stem}_psccnet_heatmap.png'}"  # noqa: E501
         )
         with open(output_folder / f"{image_path.stem}_psccnet_detection.txt", "w") as f:
             f.write(f"score: {detection.item()}")
         logger.info(
-            f"Detection score saved to {output_folder / f'{image_path.stem}_psccnet_detection.txt'}"
+            f"Detection score saved to {output_folder / f'{image_path.stem}_psccnet_detection.txt'}"  # noqa: E501
         )
 
     if show_plot:
@@ -557,7 +564,7 @@ def run_splicebuster(
         plt.imshow(heatmap)
         plt.savefig(output_folder / f"{image_path.stem}_splicebuster_heatmap.png")
         logger.info(
-            f"Heatmap saved to {output_folder / f'{image_path.stem}_splicebuster_heatmap.png'}"
+            f"Heatmap saved to {output_folder / f'{image_path.stem}_splicebuster_heatmap.png'}"  # noqa: E501
         )
 
     if show_plot:
@@ -590,8 +597,8 @@ def run_trufor(
 ):
     from photoholmes.methods.trufor import TruFor, trufor_preprocessing
 
-    image = read_image(str(image_path))
-    model_input = trufor_preprocessing(image=image)
+    image = read_image(image_path)
+    model_input = trufor_preprocessing(image=image.to(device))
 
     if weights_path is None:
         logger.info(
@@ -609,6 +616,11 @@ def run_trufor(
     trufor.to_device(device)
 
     heatmap, confidence, detection, _ = trufor.predict(**model_input)
+    heatmap = heatmap.cpu()
+    if confidence is not None:
+        confidence = confidence.cpu()
+    if detection is not None:
+        detection = detection.cpu()
 
     if output_folder is not None:
         os.makedirs(output_folder, exist_ok=True)
@@ -616,7 +628,7 @@ def run_trufor(
         plt.imshow(heatmap)
         plt.savefig(output_folder / f"{image_path.stem}_trufor_heatmap.png")
         logger.info(
-            f"Heatmap saved to {output_folder / f'{image_path.stem}_trufor_heatmap.png'}"  # noqa: E502
+            f"Heatmap saved to {output_folder / f'{image_path.stem}_trufor_heatmap.png'}"  # noqa: E501
         )
         if confidence is not None:
             plt.imshow(confidence.numpy())
@@ -682,19 +694,19 @@ def run_zero(
 
     from photoholmes.methods.zero import Zero, zero_preprocessing
 
-    image = read_image(str(image_path))
+    image = read_image(image_path)
     model_input = zero_preprocessing(image=image)
 
     zero = Zero(missing_grids=missing_grids)
 
     logger.info("Running Zero method")
-    mask, votes, missing_grids_mask = zero.predict(**model_input)
+    _, mask, votes, missing_grids_mask = zero.predict(**model_input)
 
     if output_folder is not None:
         os.makedirs(output_folder, exist_ok=True)
 
         plt.imshow(mask)
-        plt.savefig(output_folder / f"{image_path.stem}_zero_mask.png")
+        plt.savefig(output_folder / f"{image_path.stem}_zero_forgery_mask.png")
         logger.info(
             f"Mask saved to {output_folder / f'{image_path.stem}_zero_mask.png'}"
         )
@@ -702,11 +714,11 @@ def run_zero(
         logger.info(
             f"Votes saved to {output_folder / f'{image_path.stem}_zero_votes.npy'}"
         )
-        if missing_grids:
+        if missing_grids_mask:
             plt.imshow(missing_grids_mask)
             plt.savefig(output_folder / f"{image_path.stem}_zero_missing_grids.png")
             logger.info(
-                f"Votes saved to {output_folder / f'{image_path.stem}_zero_missing_grids.png'}"
+                f"Votes saved to {output_folder / f'{image_path.stem}_zero_missing_grids.png'}"  # noqa: E501
             )
 
     if show_plot:

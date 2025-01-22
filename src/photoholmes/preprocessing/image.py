@@ -71,8 +71,8 @@ class Normalize(BasePreprocessing):
                 - **kwargs: The additional keyword arguments passed through unchanged.
         """
         if isinstance(image, Tensor):
-            mean = torch.as_tensor(self.mean, dtype=torch.float32)
-            std = torch.as_tensor(self.std, dtype=torch.float32)
+            mean = torch.as_tensor(self.mean, dtype=torch.float32, device=image.device)
+            std = torch.as_tensor(self.std, dtype=torch.float32, device=image.device)
 
             if image.ndim == 3:
                 mean = mean.view(3, 1, 1)
