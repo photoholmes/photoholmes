@@ -37,7 +37,7 @@ output = method.predict(**input)
 
 ## Citation
 
-```tex
+``` bibtex
 @inproceedings{zero,
   TITLE = {{JPEG Grid Detection based on the Number of DCT Zeros and its Application to Automatic and Localized Forgery Detection}},
   AUTHOR = {Nikoukhah, Tina and Anger, J and Ehret, T and Colom, Miguel and Morel, J M and Grompone von Gioi, R},

@@ -4,18 +4,18 @@
 
 ## Introduction
 
-PhotoHolmes is an open-source _python_ library designed to easily run and benchmark forgery detection methods on digital images. The library includes an implementation of popular and state-of-the-art methods, datasets and evaluation metrics, all of which easily integrates with their custom methods, datasets and metrics. The user can also evaluate a single image via the command-line-interface (CLI) or a full method in a chosen dataset via de Benchmark class.
+PhotoHolmes is an open-source _python_ library designed to easily run and benchmark forgery detection methods on digital images. The library includes an implementation of popular and state-of-the-art methods, datasets and evaluation metrics, all of which easily integrate with their custom methods, datasets and metrics. The user can also evaluate a single image via the command-line interface (CLI) or a full method on a chosen dataset via the `Benchmark` class.
 
 ## Development setup
 
-The Python requirements are `python >= 3.10`. Create a virtual enviroment, either with conda or with pip. 
+The Python requirements are `python >= 3.10`. Create a virtual enviroment, either with conda or with pip.
 Activate the enviroment and install the library and required packages. For the latter, there are two options.
 
 ### Install: Benchmarking and library use
 
-If you only wish to use the library as a user, for bencharking or other uses, run:
+If you only wish to use the library as a user, for benchmarking or other uses, run:
 
-```
+``` bash
 pip install -e .
 ```
 
@@ -27,13 +27,14 @@ pip install -e .
 ### Install: Develop
 
 If you wish to develop on the library run:
-```
+
+``` bash
 pip install -e .[dev]
 ```
 
 ## Benchmarking
 
-One of the main PhotoHolmes library features is the capacity to easily benchmark a `method` over a `dataset`, evaluating on a set of `metrics`. This means one can evaluate existing and custom methods uniformly and fairly, simplifying the process of method comparison.
+One of the main features of the PhotoHolmes library is the capacity to easily benchmark a `method` over a `dataset`, evaluating on a set of `metrics`. This means one can evaluate existing and custom methods uniformly and fairly, simplifying the process of method comparison.
 
 This can be invoked in a simple manner by creating an instance of the `Benchmark` class and calling the `run` method, in the following way:
 
@@ -62,7 +63,7 @@ dataset = DatasetFactory.load(
 metrics = MetricFactory.load([MetricsRegistry.AUROC, MetricsRegistry.IOU])
 ```
 
-However, if you have a custom methods, datasets or metrics you wish to use for a benchmark, they can be easily integrated into this framework. A good example that shows different ways of implementing objects and integrating custom ones can be found in the [benchmarking a method notebook](notebooks/benchmarking_a_method.ipynb). There is also more detailed documentation and examples for each module in the respective [methods](src/photoholmes/methods/README.md), [datasets](src/photoholmes/datasets/README.md) and [metrics](src/photoholmes/metrics/README.md) READMEs.
+However, if you have custom methods, datasets or metrics you wish to use for a benchmark, they can easily be integrated into this framework. A good example that shows different ways of implementing objects and integrating custom ones can be found in the [benchmarking a method notebook](notebooks/benchmarking_a_method.ipynb). There is also more detailed documentation and examples for each module in the respective [methods](src/photoholmes/methods/README.md), [datasets](src/photoholmes/datasets/README.md) and [metrics](src/photoholmes/metrics/README.md) READMEs.
 
 > **Warning on MPS as a device:** We advise the user to be careful when running a method on `mps` as the `device`. The PhotoHolmes team found it produces different outputs (with respect to `cpu` or `cuda`) in some cases.
 
@@ -84,5 +85,4 @@ If you integrate any method, dataset or metrics that are not included in PhotoHo
 
 PhotoHolmes integrates a variety of methods, some with different associated licences than others. All of these are available at their respective `src/photoholmes/methods/<METHOD>` folder. When a user utilizes code from a specific method, they are automatically subjected to the method's respective License.
 
-This being said, the base [License](LICENSE) of this project is Apache 2.0 License, but can change into a more restrictive License according to the methods used by the user. For instance, using the method TruFor or its code in any way implies the user accepts its respective License, which among other things, limits the use of this software to non-profit purposes, which is more restrictive than the base License aforementioned.
-
+This being said, the base [License](LICENSE) of this project is the Apache 2.0 License, but can change into a more restrictive License according to the methods used by the user. For instance, using the method TruFor or its code in any way implies the user accepts its respective License, which among other things, limits the use of this software to non-profit purposes, which is more restrictive than the aforementioned base License.

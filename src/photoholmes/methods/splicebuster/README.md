@@ -1,8 +1,8 @@
 # Splicebuster: a new blind image splicing detector
 
-This is the implementation of the method by Cozzolino et al. that can be found [here](https://ieeexplore.ieee.org/abstract/document/7368565) paper. 
+This is the implementation of the method by Cozzolino et al. that can be found [here](https://ieeexplore.ieee.org/abstract/document/7368565) paper.
 
-The code contained in this library was derived from [the original implementation](https://www.grip.unina.it/download/prog/Splicebuster/) and from a code provided by Marina Gardella, Quentin Bammey and Tina Nikoukhah, making only minor changes to fit the PhotoHolmes library structure. 
+The code contained in this library was derived from [the original implementation](https://www.grip.unina.it/download/prog/Splicebuster/) and from a code provided by Marina Gardella, Quentin Bammey and Tina Nikoukhah, making only minor changes to fit the PhotoHolmes library structure.
 
 ## Description
 
@@ -12,7 +12,7 @@ Splicebuster is a method based on finding anomalies in an image's residual, obta
 
 Firstly, it estimates the image's residual by high-pass filtering. More specifically, it is computed by estimating the third order derivatives in both vertical and horizontal directions, obtaining two residuals $r_v$ and $r_h$. These are quantized in $3$ levels, and co-ocurrence features are extracted from them. These features are dimentionally reduced, both by merging complementary and simetrical co-ocurrences, then taking histograms of these co-ocurrences, and finally applying PCA (Principal Component Analysis) of these historams. This results in each block having 2 histograms of 25 bins as features.
 
-Over this feature map, an Expectation-Maximization algorithm is applied to estimate a two-class mixture model behind it. This can be done with two types of mixtures, either gaussian-uniform or gaussian-gaussian. The concept behind this is that the forged region can have either uniform or gaussian distribution depending on the type of forgery applied. The expectation step computes a conditional expected value of the log-likelihood, given a set of parameters. The maximization step finds the optimal set of parameters. 
+Over this feature map, an Expectation-Maximization algorithm is applied to estimate a two-class mixture model behind it. This can be done with two types of mixtures, either gaussian-uniform or gaussian-gaussian. The concept behind this is that the forged region can have either uniform or gaussian distribution depending on the type of forgery applied. The expectation step computes a conditional expected value of the log-likelihood, given a set of parameters. The maximization step finds the optimal set of parameters.
 
 Finally, the heatmap is produced by studying the relation between the Mahalanobis distance of the block's feature histogram and each of the models.
 
@@ -39,7 +39,7 @@ output = method.predict(**input)
 
 ## Citation
 
-```tex
+``` bibtex
 @INPROCEEDINGS{Splicebuster,
   author={Cozzolino, Davide and Poggi, Giovanni and Verdoliva, Luisa},
   booktitle={2015 IEEE International Workshop on Information Forensics and Security (WIFS)}, 
