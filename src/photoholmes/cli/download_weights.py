@@ -55,7 +55,7 @@ def download_psccnet_weights(weights_folder: Path):
 def download_exif_weights(weights_folder: Path):
     os.makedirs(weights_folder, exist_ok=True)
     wget.download(
-        "https://drive.usercontent.google.com/download?id=1qHG-m0cLsT_wEUrOX1coX8q1jUY8ObCK&export=download&authuser=0&confirm=t&uuid=e9b0e308-1a90-4c6c-afce-970f5654f253&at=APZUnTXYD5ThqZsRJXHeY0PIxhHF%3A1710200587419",  # noqa: E501
+        "https://drive.usercontent.google.com/download?id=1EdEzBhCY9gO3qYvoNMibk8SwAxerDtQp&export=download&authuser=0&confirm=t&uuid=d7fc01e8-e819-4d54-85fc-6013674c1397&at=AIrpjvP0YWIlV0pcXULfNBk_7TUv%3A1738204986471",  # noqa: 501
         out=str(weights_folder / "weights.pth"),
         bar=partial(callback, message="Downloading weights"),
     )
