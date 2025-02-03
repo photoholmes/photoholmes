@@ -38,9 +38,10 @@ method = DQ()
 # Use predict to get the final result
 output = method.predict(**input)   
 ```
+
 ## Citation
 
-```tex
+``` bibtex
 @ARTICLE{FastJPEGDetection2009,
   author={Zhouchen Lin, Junfeng He, Xiaoou Tang, Chi-Keung Tang},
   journal={Pattern Recognition},

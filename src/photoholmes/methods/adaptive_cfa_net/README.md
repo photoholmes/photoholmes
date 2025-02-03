@@ -1,11 +1,10 @@
-# Adaptive CFA Net: An Adaptive Neural Network for Unsupervised Mosaic Consistency Analysis in Image Forensics 
+# Adaptive CFA Net: An Adaptive Neural Network for Unsupervised Mosaic Consistency Analysis in Image Forensics
 
 This is the implemenation of the method by Bammey et al. that can be found [here](https://openaccess.thecvf.com/content_CVPR_2020/papers/Bammey_An_Adaptive_Neural_Network_for_Unsupervised_Mosaic_Consistency_Analysis_in_CVPR_2020_paper.pdf).
 
-The code contained in this library was derived from [the original implementation](https://github.com/qbammey/adaptive_cfa_forensics), making only minor changes to fit the PhotoHolmes library structure. 
+The code contained in this library was derived from [the original implementation](https://github.com/qbammey/adaptive_cfa_forensics), making only minor changes to fit the PhotoHolmes library structure.
 
-This is a deep learning based method, the weights can be found [here](https://github.com/qbammey/adaptive_cfa_forensics/tree/master/src/models) under the name [pretrained.pt](https://github.com/qbammey/adaptive_cfa_forensics/blob/master/src/models/pretrained.pt) for the pretrained weights and [adapted_to_j95_database.pt](https://github.com/qbammey/adaptive_cfa_forensics/blob/master/src/models/adapted_to_j95_database.pt) for weights obtained through training with jpeg images. We last checked this information March 9th 2024, please refer to the authors of the original paper if the weights can not be found.
-
+This is a deep learning based method, the weights can be found [here](https://github.com/qbammey/adaptive_cfa_forensics/tree/master/src/models) under the name [pretrained.pt](https://github.com/qbammey/adaptive_cfa_forensics/blob/master/src/models/pretrained.pt) for the pretrained weights and [adapted_to_j95_database.pt](https://github.com/qbammey/adaptive_cfa_forensics/blob/master/src/models/adapted_to_j95_database.pt) for weights obtained through training with jpeg images. We last checked this information on March 9th 2024, please refer to the authors of the original paper if the weights cannot be found.
 
 ## Description
 
@@ -50,7 +49,7 @@ output = method.predict(**input)
 
 ## Citation
 
-```
+``` bibtex
 @InProceedings{Bammey_2020_CVPR,
 author = {Bammey, Quentin and Gioi, Rafael Grompone von and Morel, Jean-Michel},
 title = {An Adaptive Neural Network for Unsupervised Mosaic Consistency Analysis in Image Forensics},

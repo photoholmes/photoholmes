@@ -1,17 +1,16 @@
 # PSCC-Net: Progressive Spatio-Channel Correlation Network for Image Manipulation Detection and Localization
 
-This is the implemenattion of the method by Liu et al. that can be found [here](https://arxiv.org/pdf/2103.10596.pdf).
+This is the implementation of the method by Liu et al. that can be found [here](https://arxiv.org/pdf/2103.10596.pdf).
 
-The code contained in this library was derived from [the original implementation](https://github.com/proteus1991/PSCC-Net), making only minor changes to fit the PhotoHolmes library structure. 
+The code contained in this library was derived from [the original implementation](https://github.com/proteus1991/PSCC-Net), making only minor changes to fit the PhotoHolmes library structure.
 
-This is a deep learning based method, the weights can be found [here](https://github.com/proteus1991/PSCC-Net/tree/main/checkpoint) under the name [DetectionHead_checkpoint](https://github.com/proteus1991/PSCC-Net/tree/main/checkpoint/DetectionHead_checkpoint), [HRNet_checkpoint](https://github.com/proteus1991/PSCC-Net/tree/main/checkpoint/HRNet_checkpoint) and [NLCDetection_checkpoint](https://github.com/proteus1991/PSCC-Net/tree/main/checkpoint/NLCDetection_checkpoint). We last checked this information March 9th 2024, please refer to the authors of the original paper if the weights can not be found.
+This is a deep learning based method, the weights can be found [here](https://github.com/proteus1991/PSCC-Net/tree/main/checkpoint) under the name [DetectionHead_checkpoint](https://github.com/proteus1991/PSCC-Net/tree/main/checkpoint/DetectionHead_checkpoint), [HRNet_checkpoint](https://github.com/proteus1991/PSCC-Net/tree/main/checkpoint/HRNet_checkpoint) and [NLCDetection_checkpoint](https://github.com/proteus1991/PSCC-Net/tree/main/checkpoint/NLCDetection_checkpoint). We last checked this information on March 9th 2024, please refer to the authors of the original paper if the weights cannot be found.
 
-To easily download the weights, you can use the script in scripts/download_psccnet_weights.py.
+To easily download the weights, you can use the script in `scripts/download_psccnet_weights.py`.
 
 ## Description
 
 PSCC-Net is an end-to-end fully convolutional neural network. It consists of a neural network that using a coarse to fine approach returns a mask locating forgeries in the input image. The method also returns an answer to the detection problem by returning a label that indicates whether the image was manipulated or not.
-
 
 ## Full overview
 
@@ -54,7 +53,7 @@ output = method.predict(**input)
 
 ## Citation
 
-```tex
+``` bibtex
 @article{liu2022pscc,
   title={PSCC-Net: Progressive spatio-channel correlation network for image manipulation detection and localization},
   author={Liu, Xiaohong and Liu, Yaojie and Chen, Jun and Liu, Xiaoming},
@@ -63,4 +62,3 @@ output = method.predict(**input)
   publisher={IEEE}
 }
 ```
-

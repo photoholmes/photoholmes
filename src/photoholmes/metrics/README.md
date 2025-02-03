@@ -1,26 +1,32 @@
 # Metrics Module
 
 ## Table of Contents
-- [Overview](#overview)
-- [Available Metrics](#available-metrics)
-    - [Torch-metrics](#torch-metrics)
-    - [Custom metrics](#custom-metrics)
-- [Metric Factory](#metric-factory)
-- [Examples of Use](#examples-of-use)
-    - [Using a single metric](#using-a-single-metric)
-    - [Using the factory](#using-the-metricfactory)
-- [Contribute: Adding a new metric](#contribute-adding-a-new-metric)
+
+- [Metrics Module](#metrics-module)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Available Metrics](#available-metrics)
+    - [Torch-metrics:](#torch-metrics)
+    - [Custom metrics:](#custom-metrics)
+  - [Metric Factory](#metric-factory)
+  - [Examples of Use](#examples-of-use)
+    - [Using a single metric:](#using-a-single-metric)
+    - [Using the MetricFactory:](#using-the-metricfactory)
+  - [Contribute: Adding a new metric](#contribute-adding-a-new-metric)
 
 ## Overview
+
 This module provides a collection of metrics for evaluating the performance of a method for image forgery detection and localization.
 
 The metrics are divided into two categories:
+
 - Metrics imported from [torch-metrics](https://lightning.ai/docs/torchmetrics/stable/).
 - [Custom metrics](custom_metrics.md) using torch-metrics.
 
 ## Available Metrics
 
 ### Torch-metrics:
+
 - `AUROC`: Area Under the Receiver Operating Characteristic curve. [Docs](https://lightning.ai/docs/torchmetrics/stable/classification/auroc.html) 
 - `IoU`: Intersection over Union, also known as Jaccard Index. [Docs](https://lightning.ai/docs/torchmetrics/stable/classification/jaccard_index.html)
 - `MCC`: Matthews Correlation Coefficient. [Docs](https://lightning.ai/docs/torchmetrics/stable/classification/matthews_corr_coef.html)
@@ -31,8 +37,8 @@ The metrics are divided into two categories:
 
 For more information about the available metrics in torch-metrics please refer to the [documentation](https://lightning.ai/docs/torchmetrics/stable/).
 
-
 ### Custom metrics:
+
 - `FPR`: False Positive Rate.
 - `meanAUROC`: Mean Area Under the Receiver Operating Characteristic curve.
 - `IoU_weighted_v1`: Weighted Intersection over Union v1.
@@ -57,6 +63,7 @@ Here are some examples of how to use the metrics in this module:
 ### Using a single metric:
 
 You can use the metrics directly by instantiating the class and passing the predictions and the ground truth masks as arguments. Here is an example using the `AUROC` metric:
+
 ```python
 from photoholmes.metrics import AUROC
 
@@ -73,6 +80,7 @@ auroc = auroc_metric(pred, mask)
 
 print("AUROC:", auroc)
 ```
+
 For computing the metrics over several images, call the `update` method to update the metric with the predictions and the ground truth masks. Then, call the `compute` method to get the value of the metric. Here is an example using the `AUROC` metric:
 
 ```python
@@ -172,7 +180,7 @@ metric_value = metric_collection.compute()
 print(metric_value)
 ```
 
-For adding a metric to the `MetricCollection`, you can use the `add` method of the `MetricCollection` object. For more information about the `MetricCollection` object please refer to the [documentation](https://lightning.ai/docs/torchmetrics/stable/pages/overview.html#metriccollection). Here is an example using the `MetricCollection` to add the `AUROC` metric:
+To add a metric to the `MetricCollection`, you can use the `add` method of the `MetricCollection` object. For more information about the `MetricCollection` object please refer to the [documentation](https://lightning.ai/docs/torchmetrics/stable/pages/overview.html#metriccollection). Here is an example using the `MetricCollection` to add the `AUROC` metric:
 
 ```python
 from photoholmes.metrics import MetricFactory, MetricRegistry
@@ -192,31 +200,40 @@ metric_value = metric_collection.compute()
 print(metric_value)
 ```
 
-
 ## Contribute: Adding a new metric
+
 If the metric already exists in [torch-metrics](https://lightning.ai/docs/torchmetrics/stable/) the steps to follow are:
+
 1. Add metric to registry
+
     ```python
     class MetricRegistry(Enum):
         NEW_TORCHMETRIC = "new_torch_metric"
     ```
+
 2. Add a wrapper for the metric in the `torchmetrics_wrapper.py` file if necessary. This file contains the wrapper for the metrics from [torch-metrics](https://lightning.ai/docs/torchmetrics/stable/). The wrapper should follow the same pattern as the other metrics in the file. It is implemented as a class that inherits from the `Metric` class, and has the same signature as the original.
 3. Add the metric to the `__init__.py` file of the metrics module.
 4. Add the metric to the factory by following this template
+
     ``` python
     case MetricRegistry.NEW_TORCHMETRIC:
         from photoholmes.metrics import New_Torch_Metric as NTM
         metrics.append(NTM())
     ```
+
 If the metric does not exist in [torch-metrics](https://lightning.ai/docs/torchmetrics/stable/) you should follow the instructions provided by [torch-metrics](https://lightning.ai/docs/torchmetrics/stable/) [here](https://lightning.ai/docs/torchmetrics/stable/pages/implement.html), so the steps are as follows:
+
 1. Create the .py file as explained in the tutorial of [torch-metrics](https://lightning.ai/docs/torchmetrics/stable/).
 2. Add metric to registry
+
     ```python
     class MetricRegistry(Enum):
         FANCY_NEW_METRIC = "fancy_new_metric"
     ```
+
 3. Add the metric to the `__init__.py` file of the metrics module.
-3. Add the metric to the factory by following this template
+4. Add the metric to the factory by following this template
+
     ``` python
     case MetricRegistry.FANCY_NEW_METRIC:
         from photoholmes.metrics import Fancy_New_Metric as FNM
