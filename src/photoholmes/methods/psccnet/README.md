@@ -1,6 +1,6 @@
 # PSCC-Net: Progressive Spatio-Channel Correlation Network for Image Manipulation Detection and Localization
 
-This is the implemenation of the method by Liu et al. that can be found [here](https://arxiv.org/pdf/2103.10596.pdf).
+This is the implementation of the method by Liu et al. that can be found [here](https://arxiv.org/pdf/2103.10596.pdf).
 
 The code contained in this library was derived from [the original implementation](https://github.com/proteus1991/PSCC-Net), making only minor changes to fit the PhotoHolmes library structure.
 
