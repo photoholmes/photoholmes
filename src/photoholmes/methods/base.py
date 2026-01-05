@@ -106,7 +106,7 @@ class BaseTorchMethod(BaseMethod, Module):
     def load_weights(self, weights: Union[str, Path, dict]):
         """Load weights from a dictionary or a file when given its path."""
         if isinstance(weights, (str, Path)):
-            weights_ = torch.load(weights, map_location=self.device)
+            weights_ = torch.load(weights, map_location=self.device, weights_only=False)
         else:
             weights_ = weights
 

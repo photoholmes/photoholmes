@@ -16,7 +16,7 @@ dependencies = [
     "scikit-image",
     "pydantic",
     "tqdm",
-    "jpegio",
+    "jpeglib",
     "scipy",
     "pyyaml",
     "mpmath",

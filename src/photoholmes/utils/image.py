@@ -1,10 +1,10 @@
 import logging
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 import cv2 as cv
-import jpegio
+import jpeglib
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -187,29 +187,29 @@ def read_jpeg_data(
     """
 
     if image_path.endswith(".jpg") or image_path.endswith(".jpeg"):
-        jpeg = jpegio.read(image_path)
+        jpeg = jpeglib.read_dct(image_path)
     else:
         if not suppress_not_jpeg_warning:
             logger.warning(
                 "Image is not in JPEG format. An approximation will be loaded by "
-                "compressing the image in quality 100."
+                + "compressing the image in quality 100."
             )
         temp = NamedTemporaryFile(suffix=".jpg")
         img = read_image(image_path)
         save_image(temp.name, img, [cv.IMWRITE_JPEG_QUALITY, 100])
-        jpeg = jpegio.read(temp.name)
+        jpeg = jpeglib.read_dct(temp.name)
 
     return torch.tensor(
         _DCT_from_jpeg(jpeg, num_channels=num_dct_channels)
     ), torch.tensor(np.array(_qtables_from_jpeg(jpeg, all=all_quant_tables)))
 
 
-def _qtables_from_jpeg(jpeg: jpegio.DecompressedJpeg, all: bool = False) -> NDArray:
+def _qtables_from_jpeg(jpeg: jpeglib.DCTJPEG, all: bool = False) -> NDArray:
     """
     Gets the quantization tables from a JPEG image.
 
     Args:
-        jpeg (jpegio.DecompressedJpeg): The decompressed JPEG image.
+        jpeg: The JPEG DCT object from jpeglib.
         all (bool, optional): If True, returns all quantization tables.
             Defaults to False.
 
@@ -217,21 +217,19 @@ def _qtables_from_jpeg(jpeg: jpegio.DecompressedJpeg, all: bool = False) -> NDAr
         NDArray: The quantization tables.
     """
     if all:
-        return np.array(
-            [jpeg.quant_tables[i].copy() for i in range(len(jpeg.quant_tables))]
-        )
+        return np.array([jpeg.qt[i].copy() for i in range(qt.shape[0])])
     else:
-        return np.array(jpeg.quant_tables[0].copy())
+        return np.array(jpeg.qt[0].copy())
 
 
 def _DCT_from_jpeg(
-    jpeg: jpegio.DecompressedJpeg, num_channels: Optional[int] = None
+    jpeg: jpeglib.DCTJPEG, num_channels: Optional[int] = None
 ) -> NDArray:
     """
     Gets the DCT coefficients from a JPEG image.
 
     Args:
-        jpeg (jpegio.DecompressedJpeg): The decompressed JPEG image.
+        jpeg: The JPEG DCT object from jpeglib.
         num_channels (int, optional): Number of channels to read from the DCT stream.
             Defaults to None.
 
@@ -239,14 +237,26 @@ def _DCT_from_jpeg(
         NDArray: The DCT coefficients.
 
     Note: Code derived from https://github.com/mjkwon2021/CAT-Net.git.
+    Optimized to work directly with jpeglib's block format without unnecessary reshaping.
     """
-    if num_channels is None:
-        num_channels = len(jpeg.coef_arrays)
-    ci = jpeg.comp_info
+    # Extract DCT arrays from jpeglib
+    coef_arrays = []
+    if jpeg.Y is not None:
+        coef_arrays.append(jpeg.Y)
+    if jpeg.Cb is not None:
+        coef_arrays.append(jpeg.Cb)
+    if jpeg.Cr is not None:
+        coef_arrays.append(jpeg.Cr)
+    if hasattr(jpeg, "K") and jpeg.K is not None:
+        coef_arrays.append(jpeg.K)
 
-    sampling_factors = np.array(
-        [[ci[i].v_samp_factor, ci[i].h_samp_factor] for i in range(num_channels)]
-    )
+    if num_channels is None:
+        num_channels = len(coef_arrays)
+
+    # jpeglib samp_factor is a numpy array of shape (num_components, 2)
+    # where each row is [v_samp_factor, h_samp_factor]
+    sampling_factors = jpeg.samp_factor[:num_channels].copy()
+
     if num_channels == 3:
         if (sampling_factors[:, 0] == sampling_factors[0, 0]).all():
             sampling_factors[:, 0] = 2
@@ -255,23 +265,52 @@ def _DCT_from_jpeg(
     else:
         sampling_factors[0, :] = 2
 
-    dct_shape = jpeg.coef_arrays[0].shape
+    # Get target shape from first channel (Y component)
+    # jpeglib format: (num_blocks_y, num_blocks_x, 8, 8)
+    blocks_y, blocks_x = coef_arrays[0].shape[:2]
+    dct_shape = (blocks_y * 8, blocks_x * 8)
     DCT_coef = np.empty((num_channels, *dct_shape))
 
     for i in range(num_channels):
-        r, c = jpeg.coef_arrays[i].shape
-        block_coefs = (
-            jpeg.coef_arrays[i].reshape(r // 8, 8, c // 8, 8).transpose(0, 2, 1, 3)
-        )
-        r_factor, c_factor = 2 // sampling_factors[i][0], 2 // sampling_factors[i][1]
-        channel_coefficients = np.zeros((r * r_factor, c * c_factor))
-        channel_coefficient_blocks = channel_coefficients.reshape(
-            r // 8, r_factor * 8, c // 8, c_factor * 8
-        ).transpose(0, 2, 1, 3)
-        channel_coefficient_blocks[:, :, :, :] = np.tile(
-            block_coefs, (r_factor, c_factor)
-        )
+        # Get current channel's block array
+        # jpeglib already provides in block format: (blocks_y, blocks_x, 8, 8)
+        block_coefs = coef_arrays[i]
+        cur_blocks_y, cur_blocks_x = block_coefs.shape[:2]
 
+        # Calculate upsampling factors
+        r_factor = 2 // sampling_factors[i][0]  # vertical upsampling
+        c_factor = 2 // sampling_factors[i][1]  # horizontal upsampling
+
+        # Create output array for this channel
+        output_height = cur_blocks_y * 8 * r_factor
+        output_width = cur_blocks_x * 8 * c_factor
+
+        if r_factor == 1 and c_factor == 1:
+            # No upsampling needed, just reshape from block format to flat format
+            # Transpose from (blocks_y, blocks_x, 8, 8) to flat format
+            channel_coefficients = block_coefs.transpose(0, 2, 1, 3).reshape(
+                cur_blocks_y * 8, cur_blocks_x * 8
+            )
+        else:
+            # Need to upsample by repeating blocks
+            # Create the output in block format first
+            upsampled_blocks = np.zeros(
+                (cur_blocks_y * r_factor, cur_blocks_x * c_factor, 8, 8)
+            )
+
+            # Tile the blocks according to sampling factors
+            for r_idx in range(r_factor):
+                for c_idx in range(c_factor):
+                    upsampled_blocks[r_idx::r_factor, c_idx::c_factor, :, :] = (
+                        block_coefs
+                    )
+
+            # Convert from block format to flat format
+            channel_coefficients = upsampled_blocks.transpose(0, 2, 1, 3).reshape(
+                output_height, output_width
+            )
+
+        # Crop to target shape if necessary
         DCT_coef[i, :, :] = channel_coefficients[: dct_shape[0], : dct_shape[1]]
 
     return DCT_coef.astype(int)
